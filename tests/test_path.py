@@ -2,6 +2,7 @@ import os
 import pytest
 from pydu.platform import WINDOWS
 from pydu.path import cd, is_super_path, normjoin, filename, fileext
+from pydu.path import FileNameAndPath
 
 
 def test_cd(tmpdir):
@@ -51,3 +52,25 @@ def test_fileext():
     assert fileext('/foo/bar') == ''
     assert fileext('/foo/bar.ext') == '.ext'
     assert fileext('/foo/bar.more.ext') == '.ext'
+
+def test_FileNameAndPath():
+    fnap = FileNameAndPath(file_path_and_name="C:\\foo\\bar.txt")
+    assert fnap.path == 'C:\\foo\\bar.txt'
+    assert fnap.raw_file_path_and_name == 'C:\\foo\\bar.txt'
+    assert fnap.exists == False
+    assert fnap.file_name_tuple ==('bar','.txt')
+    assert fnap.file_name == 'bar.txt'
+    assert fnap.only_path == 'C:\\foo\\'
+    assert fnap.only_name =='bar'
+    assert fnap.only_suffix == '.txt'
+
+    fnap2 = FileNameAndPath(file_path_and_name="/User/foo/bar.txt")
+    assert fnap2.raw_file_path_and_name == '/User/foo/bar.txt'
+    assert fnap2.path == '/User/foo/bar.txt'
+    assert fnap2.exists == False
+    assert fnap2.file_name_tuple ==('bar','.txt')
+    assert fnap2.file_name == 'bar.txt'
+    assert fnap2.only_path == '/User/foo/'
+    assert fnap2.only_name =='bar'
+    assert fnap2.only_suffix == '.txt'
+
