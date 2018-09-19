@@ -1,5 +1,6 @@
 import os
 from contextlib import contextmanager
+from .platform import WINDOWS, LINUX
 
 
 @contextmanager
@@ -52,3 +53,82 @@ def fileext(path):
     If file has not extension, return empty string.
     """
     return os.path.splitext(os.path.basename(path))[1]
+
+
+WINDOWS_FILE_PATH_SEP = "\\"
+
+LINUX_FILE_PATH_SEP = "/"
+
+
+class FileNameAndPath(object):
+    """
+    FileNameAndPath provider multiple properties
+     which include  `raw_file_name`,`path`,`exists`,`file_name_tuple`,
+     `file_name`,`only_suffix`,`only_name` and `only path`
+
+    parse properties of  file path  more convenient
+    """
+    def __init__(self, file_path_and_name):
+        self.file_path_and_name = file_path_and_name
+
+    @property
+    def raw_file_path_and_name(self):
+        """property of `raw_file_path_and_name`"""
+        return self.file_path_and_name
+
+    @property
+    def path(self):
+        """property of `path`"""
+        ret_join_path = ""
+
+        if WINDOWS:
+            for single_item in self.file_path_and_name.split(WINDOWS_FILE_PATH_SEP):
+                if single_item.__contains__(":"):
+                    ret_join_path = os.path.join(ret_join_path, single_item, WINDOWS_FILE_PATH_SEP)
+                else:
+                    ret_join_path = os.path.join(ret_join_path, single_item)
+            return ret_join_path
+
+        elif LINUX:
+            # Not Windows
+            for single_item in self.file_path_and_name.split(LINUX_FILE_PATH_SEP):
+                ret_join_path = os.path.join(ret_join_path, single_item)
+            return ret_join_path
+        else:
+            # others
+            return ret_join_path
+
+    @property
+    def exists(self):
+        """ property of  `exists` , check file whether  exists"""
+        return os.path.exists(self.path)
+
+    @property
+    def file_name_tuple(self):
+        """ property of  `file_name_tuple`  , show name tuple include file name and file suffix ,
+         sample as ("a",".txt")"""
+        return os.path.splitext(os.path.basename(self.path))
+
+    @property
+    def file_name(self):
+        """ property of `file_name` , show file name string include file name and file suffix ,sample as `a.txt` """
+        return "".join(self.file_name_tuple)
+
+    @property
+    def only_suffix(self):
+        """ property of  `only_suffix` , only show file suffix if file has specific suffix else show `None`
+            sample as `.txt`
+        """
+        if not self.raw_file_path_and_name.__contains__("."):
+            return None
+        return self.file_name_tuple[1]
+
+    @property
+    def only_name(self):
+        """ property of  `only_name`  , only show file name exclude path , sample as `a` """
+        return self.file_name_tuple[0]
+
+    @property
+    def only_path(self):
+        """ property of  `only_path`  , only show file path exclude file name"""
+        return self.file_path_and_name.replace(self.file_name, "")
