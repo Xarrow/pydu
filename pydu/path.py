@@ -89,14 +89,12 @@ class FileNameAndPath(object):
                     ret_join_path = os.path.join(ret_join_path, single_item)
             return ret_join_path
 
-        elif LINUX:
-            # Not Windows
+        else:
+            # Not Windows , default linux file path sep
             for single_item in self.file_path_and_name.split(LINUX_FILE_PATH_SEP):
                 ret_join_path = os.path.join(ret_join_path, single_item)
             return ret_join_path
-        else:
-            # others
-            return ret_join_path
+
 
     @property
     def exists(self):
@@ -132,3 +130,7 @@ class FileNameAndPath(object):
     def only_path(self):
         """ property of  `only_path`  , only show file path exclude file name"""
         return self.file_path_and_name.replace(self.file_name, "")
+
+if __name__ == '__main__':
+    fnas = FileNameAndPath(file_path_and_name="/User/foo/bar.txt")
+    print(fnas)
